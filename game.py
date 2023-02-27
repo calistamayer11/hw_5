@@ -6,14 +6,18 @@ class Game:
 
     def __init__(self, maze):
         self._maze = maze
-        self.num_rows = len(maze)
-        self.num_cols = len(maze[0])
-        self.visited = []
-        for i in range(self.num_rows):
-            row = []
-            for j in range(self.num_cols):
-                row.append(False)
-            self.visited.append(row)
+        # self.num_rows = len(maze)
+        # self.num_cols = len(maze[0])
+        self.list_of_winning_scores_paths = []
+        # self._visited = []
+
+    # def update_visited(self, row, col):
+    #     self._visited.append(row, col)
+    # for i in range(self.num_rows):
+    #     row = []
+    #     for j in range(self.num_cols):
+    #         row.append(False)
+    #     self.visited.append(row)
 
     # Creating simple methods (like the next two) to abstract core parts
     #   of your algorithm helps increase the readability of your code.
@@ -31,48 +35,67 @@ class Game:
     # TODO - Main recursive method. Add your algorithm here.
     def find_route(self, currow, curcol, curscore, curpath):
         # check if the current position is goal position
-        if (currow, curcol) == self._finish:
-            return curpath, curscore
+        # if (currow, curcol) == self._finish:
+        if self._is_puzzle_solved(currow, curcol):
+            # self.winning_paths.append((curpath, curscore))
+            return curscore, curpath
 
         # check if the current position is a valid position
-        if not self._is_move_available(currow, curcol):
+        if not self._is_move_available(currow, curcol, curpath):
+            return None
+
+        if self._maze.is_wall(currow, curcol):
             return None
 
         # mark the current position as visited
-        self.visited[currow][curcol] = True
+        # self.visited[currow][curcol] = True
 
         # create a list of possible moves
-        possible_moves = [
-            (currow - 1, curcol),
-            (currow + 1, curcol),
-            (currow, curcol - 1),
-            (currow, curcol + 1),
-        ]
+        # possible_moves = [
+        #     (currow - 1, curcol),
+        #     (currow + 1, curcol),
+        #     (currow, curcol - 1),
+        #     (currow, curcol + 1),
+        # ]
+        if self._maze.is_move_in_maze(currow - 1, curcol):
+            self.find_route(
+                currow - 1,
+                curcol,
+                curscore + self._maze._maze[currow][curcol],
+                curpath.append((currow - 1, curcol)),
+            )
+            # add positional arguments to the other 3
+
+        if self._maze.is_move_in_maze(currow + 1, curcol):
+            self.find_route(currow + 1, curcol)
+        if self._maze.is_move_in_maze(currow, curcol - 1):
+            self.find_route(currow, curcol - 1)
+        if self._maze.is_move_in_maze(currow, curcol + 1):
+            self.find_route(currow, curcol + 1)
 
         # explore the moves
-        for nextrow, nextcol in possible_moves:
-            # Check if next position is valid and not visited before
-            if (
-                self._is_move_available(nextrow, nextcol)
-                and not self.visited[nextrow][nextcol]
-            ):
+        # for nextrow, nextcol in possible_moves:
+        #     # Check if next position is valid and not visited before
+        #     if (
+        #         self._is_move_available(nextrow, nextcol, curpath)
+        #         and not self.visited[nextrow][nextcol]
+        #     ):
 
-                # Recursively call find_route with next position
+        #         # Recursively call find_route with next position
 
-                nextpath, nextscore = self.find_route(
-                    nextrow,
-                    nextcol,
-                    curscore + self.maze[nextrow][nextcol],
-                    curpath + [(nextrow, nextcol)],
-                )
+        #         self.find_route(
+        #             nextrow,
+        #             nextcol,
+        #             curscore + self.maze._maze[nextrow][nextcol],
+        #             curpath.append(currow, curcol),
+        #         )
 
-                # If a path was found, append it to the current path and update the score
-                if nextpath is not None:
-                    curpath += nextpath[1:]
-                    curscore += nextscore
+        #         # If a path was found, append it to the current path and update the score
+        #         if nextpath is not None:
+        #             curpath += nextpath[1:]
+        #             curscore += nextscore
 
         # mark current position as visited
-        self.visited[currow][curcol] = False
 
         # return None if no path was found
         return None
