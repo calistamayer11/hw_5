@@ -6,18 +6,6 @@ class Game:
 
     def __init__(self, maze):
         self._maze = maze
-        # self.num_rows = len(maze)
-        # self.num_cols = len(maze[0])
-        self.list_of_winning_scores_paths = []
-        # self._visited = []
-
-    # def update_visited(self, row, col):
-    #     self._visited.append(row, col)
-    # for i in range(self.num_rows):
-    #     row = []
-    #     for j in range(self.num_cols):
-    #         row.append(False)
-    #     self.visited.append(row)
 
     # Creating simple methods (like the next two) to abstract core parts
     #   of your algorithm helps increase the readability of your code.
@@ -34,36 +22,17 @@ class Game:
     ########################################################
     # TODO - Main recursive method. Add your algorithm here.
     def find_route(self, currow, curcol, curscore, curpath):
-        # print(currow)
-        # check if the current position is goal position
-        # if (currow, curcol) == self._finish:
-
-        print(currow)
-        print(curpath)
-        print(curscore)
+        """Method checks if move is available/valid, then recursively moves through grid while adding up the score. Returns max score as a tuple."""
         if self._is_puzzle_solved(currow, curcol):
-            # self.winning_paths.append((curpath, curscore))
-            return curscore, curpath
+            return curscore, curpath + [(currow, curcol)]
 
         # check if the current position is a valid position
-        if not self._is_move_available(currow, curcol, curpath):
-            # return None, None
-            return (-1, -1)
+        if not self._is_move_available(currow, curcol, curpath) or self._maze.is_wall(
+            currow, curcol
+        ):
+            return (-1, [])
 
-        if self._maze.is_wall(currow, curcol):
-            return (-1, -1)
-
-        # mark the current position as visited
-        # self.visited[currow][curcol] = True
-
-        # create a list of possible moves
-        # possible_moves = [
-        #     (currow - 1, curcol),
-        #     (currow + 1, curcol),
-        #     (currow, curcol - 1),
-        #     (currow, curcol + 1),
-        # ]
-        up = (-1, -1)
+        up = (-1, [])
         if self._maze.is_move_in_maze(currow - 1, curcol):
             up = self.find_route(
                 currow - 1,
@@ -72,7 +41,7 @@ class Game:
                 curpath + [(currow, curcol)],
             )
             # add positional arguments to the other 3
-        down = (-1, -1)
+        down = (-1, [])
         if self._maze.is_move_in_maze(currow + 1, curcol):
             down = self.find_route(
                 currow + 1,
@@ -81,7 +50,7 @@ class Game:
                 curpath + [(currow, curcol)],
             )
 
-        left = (-1, -1)
+        left = (-1, [])
         if self._maze.is_move_in_maze(currow, curcol - 1):
             left = self.find_route(
                 currow,
@@ -89,7 +58,7 @@ class Game:
                 curscore + self._maze._maze[currow][curcol],
                 curpath + [(currow, curcol)],
             )
-        right = (-1, -1)
+        right = (-1, [])
         if self._maze.is_move_in_maze(currow, curcol + 1):
             right = self.find_route(
                 currow,
@@ -99,14 +68,10 @@ class Game:
             )
 
         list_of_moves = [up, down, left, right]
-        print(list_of_moves)
 
         # get the maximum score from the list
         max_tuple_score = max(list_of_moves)
-        # return max(list_of_moves) # get the maximum score tuple to return from the list!!!!!
         return max_tuple_score
-
-        # return None, None
 
 
 # This block of code will be useful in debugging your algorithm. But you still need
